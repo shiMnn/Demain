@@ -40,4 +40,9 @@
         Friendly,           //!< 味方勢力
         Opponent,           //!< 敵勢力
     }
+
+    /// <summary>アクション種別</summary>
+    public enum ActionType {
+        Move,
+    }
 }

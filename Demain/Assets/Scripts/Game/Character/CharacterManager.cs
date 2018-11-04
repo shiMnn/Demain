@@ -23,8 +23,6 @@ namespace game {
                     collection.Add(character);
                 }
             }
-
-            
         }
 
         /// <summary>

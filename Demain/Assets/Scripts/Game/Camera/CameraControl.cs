@@ -4,11 +4,11 @@ namespace game {
         Camera m_camera = null;
 
         [SerializeField, Range(-10.0f, 10.0f)]
-        private float offSetX = 0.0f;
+        private float offsetX = 0.0f;
         [SerializeField, Range(-10.0f, 10.0f)]
-        private float offSetY = 4.0f;
+        private float offsetY = 4.0f;
         [SerializeField, Range(-10.0f, 10.0f)]
-        private float offsetZ = 0.0f;
+        private float offsetZ = 1.0f;
 
         private void Awake() {
             m_camera = gameObject.GetComponent<Camera>();
@@ -18,8 +18,8 @@ namespace game {
             var controlCharacter = CharacterManager.Instance.GetControllableCharacter();
             if (controlCharacter != null) 
             {// 操作中のキャラクターにカメラを追従させる
-                gameObject.transform.position = new Vector3(controlCharacter.transform.position.x + offSetX,
-                                                            controlCharacter.transform.position.y + offSetY,
+                gameObject.transform.position = new Vector3(controlCharacter.transform.position.x + offsetX,
+                                                            controlCharacter.transform.position.y + offsetY,
                                                             controlCharacter.transform.position.z + offsetZ);
 
                 // 目標の方向を向く

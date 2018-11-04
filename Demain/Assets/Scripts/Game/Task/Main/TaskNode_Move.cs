@@ -35,6 +35,7 @@ namespace game {
             switch (m_step) {
                 case Step.Init: {
                         int targetPosX = m_characterModule.MapIndex_X;
+                        int targetPosY = m_characterModule.MapIndex_Y;
                         int targetPosZ = m_characterModule.MapIndex_Z;
                         switch (m_direction) {
                             case Direction.Top: {
@@ -54,10 +55,28 @@ namespace game {
                                 }
                                 break;
                         }
-                        m_characterModule.SetTargetPos(targetPosX, 1, targetPosZ);
+
+                        if (BlockManager.Instance.GetBlock(targetPosX, targetPosY, targetPosZ) == null) 
+                        {// 目標一にブロックがない。移動許可
+                            var action = m_characterModule.GetAction(ActionType.Move) as Action_Move;
+                            if(action != null) {
+                                action.SetTarget(targetPosX, targetPosY, targetPosZ);
+                                m_step = Step.Processing;
+                            }
+                        } else {
+                            return true;
+                        }
                     }
-                    return true;
+                    break;
                 case Step.Processing: {
+                        var action = m_characterModule.GetAction(ActionType.Move) as Action_Move;
+                        if (action != null) {
+                            if (!action.IsBusy()) {
+                                return true;
+                            }
+                        } else {
+                            return true;
+                        }
                     }
                     break;
                 case Step.Finish: {

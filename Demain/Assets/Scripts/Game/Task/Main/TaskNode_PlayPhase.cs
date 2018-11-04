@@ -7,16 +7,16 @@ namespace game {
         }
         public override bool Exec() {
             Direction direction = Direction.None;
-            if (Input.GetKeyDown(KeyCode.W)) {
+            if (Input.GetKey(KeyCode.W)) {
                 direction = Direction.Top;
             }
-            if (Input.GetKeyDown(KeyCode.S)) {
+            if (Input.GetKey(KeyCode.S)) {
                 direction = Direction.Bottom;
             }
-            if (Input.GetKeyDown(KeyCode.A)) {
+            if (Input.GetKey(KeyCode.A)) {
                 direction = Direction.Left;
             }
-            if (Input.GetKeyDown(KeyCode.D)) {
+            if (Input.GetKey(KeyCode.D)) {
                 direction = Direction.Right;
             }
             if (direction != Direction.None) {
