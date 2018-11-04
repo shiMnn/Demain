@@ -6,12 +6,16 @@ namespace game {
         public int MapIndex_Y { get; protected set; }
         public int MapIndex_Z { get; protected set; }
 
+        public BlockType BlockType { get; protected set; }
+
         private GameObject m_aboveBlock = null;
 
         public bool IsRoom { get; private set; }
         public int RoomID { get; private set; }
 
-        public void Initialize(int x, int y, int z) {
+        public void Initialize(BlockType type, int x, int y, int z) {
+            this.BlockType = type;
+
             this.MapIndex_X = x;
             this.MapIndex_Y = y;
             this.MapIndex_Z = z;

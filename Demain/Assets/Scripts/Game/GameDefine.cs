@@ -41,6 +41,15 @@
         Opponent,           //!< 敵勢力
     }
 
+    public enum BlockType {
+        NormalFloor = 0,    //!< 普通の床
+
+        Stairs      = 100,  //!< 階段
+
+        Wall        = 200,  //!< 壁
+        Untachable  = 999,  //!< 干渉できない領域
+    }
+
     /// <summary>アクション種別</summary>
     public enum ActionType {
         Move,

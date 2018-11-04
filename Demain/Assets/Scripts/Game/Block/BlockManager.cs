@@ -13,6 +13,18 @@ namespace game {
             m_blocks.Add(block);
         }
 
+        public void AllRelease() {
+            int size = m_blocks.Count;
+            for(int i = 0; i < size; ++i) {
+                var block = m_blocks[i];
+                if (block != null) {
+                    GameObject.Destroy(block.gameObject);
+                }
+            }
+
+            m_blocks.Clear();
+        }
+
         /// <summary>
         /// 指定座標のブロックを取得する
         /// </summary>
@@ -31,7 +43,6 @@ namespace game {
                     }
                 }
             }
-
             return null;
         }
     }

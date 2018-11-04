@@ -64,6 +64,7 @@ namespace game {
                                 m_step = Step.Processing;
                             }
                         } else {
+                            TaskManager.Instance.Next(this, new TaskNode_PlayPhase());
                             return true;
                         }
                     }
@@ -72,7 +73,7 @@ namespace game {
                         var action = m_characterModule.GetAction(ActionType.Move) as Action_Move;
                         if (action != null) {
                             if (!action.IsBusy()) {
-                                return true;
+                                m_step = Step.Finish;
                             }
                         } else {
                             return true;
@@ -80,8 +81,30 @@ namespace game {
                     }
                     break;
                 case Step.Finish: {
+                        // 足元の床
+                        var footBlock = BlockManager.Instance.GetBlock( m_characterModule.MapIndex_X, 
+                                                                        m_characterModule.MapIndex_Y - 1, 
+                                                                        m_characterModule.MapIndex_Z);
+
+                        bool nextMap = false;
+
+                        if(footBlock != null) {
+                            var module = footBlock.GetComponent<BlockBase>();
+                            if (module != null) {
+                                if(module.BlockType == BlockType.Stairs) 
+                                {// 足元が階段。次のマップへ
+                                    nextMap = true;
+                                }
+                            }
+                        }
+
+                        if (nextMap) {
+                            TaskManager.Instance.Next(this, new TaskNode_NextMap());
+                        } else {
+                            TaskManager.Instance.Next(this, new TaskNode_PlayPhase());
+                        }
                     }
-                    break;
+                    return true;
                 case Step.ForceQuit: {
                     }
                     return true;
@@ -94,7 +117,6 @@ namespace game {
         }
 
         public override bool Setup() {
-            TaskManager.Instance.Next(this, new TaskNode_PlayPhase());
             return true;
         }
     }

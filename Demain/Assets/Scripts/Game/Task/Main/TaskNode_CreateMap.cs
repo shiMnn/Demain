@@ -38,17 +38,17 @@ namespace game {
         #endregion
         #region BlockParam
         class BlockParam {
-            public int Type { get; private set; }
+            public BlockType Type { get; private set; }
             public bool Untouchable { get; private set; }
             public int RoomID { get; private set; }
 
-            public BlockParam(int type, bool untouchable) {
+            public BlockParam(BlockType type, bool untouchable) {
                 this.Type = type;
                 this.Untouchable = untouchable;
                 this.RoomID = -1;   //!< 無効値
             }
 
-            public void ChangeType(int type, int roomId = -1) {
+            public void ChangeType(BlockType type, int roomId = -1) {
                 this.Type = type;
                 this.RoomID = roomId;
             }
@@ -69,7 +69,7 @@ namespace game {
                 m_mapSheet.Add(new List<BlockParam>());
                 for(int y = 0; y < mapHeight; ++y) {
                     untouchable = ((x < GameDefine.UNTOUCHABLE_AREA) || (y < GameDefine.UNTOUCHABLE_AREA) || (x >= (mapWidth - GameDefine.UNTOUCHABLE_AREA)) || (y >= (mapHeight - GameDefine.UNTOUCHABLE_AREA)));
-                    m_mapSheet[x].Add(new BlockParam(200, untouchable));
+                    m_mapSheet[x].Add(new BlockParam(BlockType.Wall, untouchable));
                 }
             }
 
@@ -102,11 +102,29 @@ namespace game {
                         // 床だけの情報にする
                         var blockParam = m_mapSheet[x][y];
                         if (blockParam.Untouchable) { continue; }
-                        blockParam.ChangeType(0, roomID);
+                        blockParam.ChangeType(BlockType.NormalFloor, roomID);
                     }
                 }
             }
 
+            { // 階段を作る
+                bool bRet = false;
+                while (!bRet) {
+                    int roomID = UnityEngine.Random.Range(0, size);
+                    var room = m_rooms[roomID];
+                    int x = UnityEngine.Random.Range(room.X, room.X + room.Width);
+                    int y = UnityEngine.Random.Range(room.Y, room.Y + room.Height);
+                    if (m_mapSheet.Count <= x) { continue; }
+                    if (m_mapSheet[x].Count <= y) { continue; }
+
+                    var blockParam = m_mapSheet[x][y];
+                    if (blockParam.RoomID == roomID &&
+                        !blockParam.Untouchable) {
+                        blockParam.ChangeType(BlockType.Stairs, roomID);
+                        bRet = true;
+                    }
+                }
+            }
             // 通路を作る
             foreach (var room in m_rooms) {
                 // 道をつなげる対象の部屋の数
@@ -143,7 +161,7 @@ namespace game {
                         if (y >= m_mapSheet[room.RoadPointX].Count) { continue; }
                         var blockParam = m_mapSheet[room.RoadPointX][y];
                         if (blockParam.Untouchable) { continue; }
-                        blockParam.ChangeType(0);
+                        blockParam.ChangeType(BlockType.NormalFloor);
                     }
 
                     // 横に道を作る
@@ -156,7 +174,7 @@ namespace game {
                         if (x >= m_mapSheet.Count) { continue; }
                         var blockParam = m_mapSheet[x][y];
                         if (blockParam.Untouchable) { continue; }
-                        blockParam.ChangeType(0);
+                        blockParam.ChangeType(BlockType.NormalFloor);
                     }
                 }
             }
@@ -170,13 +188,29 @@ namespace game {
                 int line = m_mapSheet[x].Count;
                 for(int y = 0; y < line; ++y) {
                     var blockParam = m_mapSheet[x][y];
-                    if(blockParam.Type == 0 || blockParam.Type == 1) {
+                    if(blockParam.Type == BlockType.Stairs) 
+                    {// 階段を作る
+                        var blockPrefab = (GameObject)Resources.Load("Game/Block/Block_Stairs");
+                        if (blockPrefab != null) {
+                            var block = GameObject.Instantiate(blockPrefab, BlockManager.Instance.gameObject.transform);
+                            var module = block.GetComponent<BlockBase>();
+                            if (module != null) {
+                                module.Initialize(BlockType.Stairs, x, 0, y);
+                                if (blockParam.RoomID != -1) {
+                                    module.SetRoomParam(blockParam.RoomID);
+                                }
+                            }
+                            BlockManager.Instance.AddBlock(block);
+                        }
+                    }
+                    else if(blockParam.Type == BlockType.NormalFloor)
+                    {// 床だけ作る
                         var blockPrefab = (GameObject)Resources.Load("Game/Block/Block_NormalFloor");
                         if (blockPrefab != null) {
                             var block = GameObject.Instantiate(blockPrefab, BlockManager.Instance.gameObject.transform);
                             var module = block.GetComponent<BlockBase>();
                             if (module != null) {
-                                module.Initialize(x, 0, y);
+                                module.Initialize(BlockType.NormalFloor, x, 0, y);
                                 if(blockParam.RoomID != -1) {
                                     module.SetRoomParam(blockParam.RoomID);
                                 }
@@ -184,7 +218,7 @@ namespace game {
                             BlockManager.Instance.AddBlock(block);
                         }
                     }
-                    else if(blockParam.Type == 200) 
+                    else if(blockParam.Type == BlockType.Wall) 
                     {// 床の上に壁ブロックを設置する
                         var floorPref = (GameObject)Resources.Load("Game/Block/Block_NormalFloor");
                         var wallPref = (blockParam.Untouchable) ? (GameObject)Resources.Load("Game/Block/Block_UntachableWall") : (GameObject)Resources.Load("Game/Block/Block_Wall");
@@ -194,8 +228,8 @@ namespace game {
                             var floorModule = floor.GetComponent<BlockBase>();
                             var wallModulle = wall.GetComponent<BlockBase>();
                             if (floorModule != null && wallModulle != null) {
-                                floorModule.Initialize(x, 0, y);
-                                wallModulle.Initialize(x, 1, y);
+                                floorModule.Initialize(BlockType.NormalFloor, x, 0, y);
+                                wallModulle.Initialize(BlockType.Wall, x, 1, y);
                                 floorModule.SetBlockOnAbove(wall);
                             }
                             BlockManager.Instance.AddBlock(floor);

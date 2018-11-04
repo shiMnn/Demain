@@ -26,15 +26,24 @@ namespace game {
                 }
             }
 
-            // プレイヤーの作成
-            var playerPrefab = (GameObject)Resources.Load("Game/Player/Player");
-            if (playerPrefab != null) {
-                var player = GameObject.Instantiate(playerPrefab, CharacterManager.Instance.gameObject.transform);
+            var player = CharacterManager.Instance.GetControllableCharacter();
+            if (player == null) {
+                // プレイヤーの作成
+                var playerPrefab = (GameObject)Resources.Load("Game/Player/Player");
+                if (playerPrefab != null) {
+                    player = GameObject.Instantiate(playerPrefab, CharacterManager.Instance.gameObject.transform);
+                    var module = player.GetComponent<CharacterBase>();
+                    if (module != null) {
+                        module.Initialize(posX, 1, posz);
+                    }
+                    CharacterManager.Instance.AddCharacter(player, Power.Friendly);
+                }
+            } else 
+            {// 座標だけ初期化
                 var module = player.GetComponent<CharacterBase>();
                 if (module != null) {
-                    module.Initialize(posX, 1, posz);
+                    module.SetMapIndex(posX, 1, posz);
                 }
-                CharacterManager.Instance.AddCharacter(player, Power.Friendly);
             }
             return true;
         }

@@ -19,6 +19,10 @@ namespace game {
         }
 
         public virtual void Initialize(int x, int y, int z) {
+            this.SetMapIndex(x, y, z);
+        }
+
+        public void SetMapIndex(int x, int y, int z) {
             this.MapIndex_X = x;
             this.MapIndex_Y = y;
             this.MapIndex_Z = z;
@@ -27,12 +31,6 @@ namespace game {
                 new Vector3(GameDefine.BLOCK_SIZE_WIDTH * MapIndex_X,
                             GameDefine.BLOCK_SIZE_HEIGHT * MapIndex_Y,
                             GameDefine.BLOCK_SIZE_DEPTH * MapIndex_Z);
-        }
-
-        public void SetMapIndex(int x, int y, int z) {
-            this.MapIndex_X = x;
-            this.MapIndex_Y = y;
-            this.MapIndex_Z = z;
         }
 
         /// <summary>
