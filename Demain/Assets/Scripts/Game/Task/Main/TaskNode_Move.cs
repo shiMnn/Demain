@@ -35,14 +35,14 @@ namespace game {
             switch (m_step) {
                 case Step.Init: {
                         int targetPosX = m_characterModule.MapIndex_X;
-                        int targetPosY = m_characterModule.MapIndex_Y;
+                        int targetPosZ = m_characterModule.MapIndex_Z;
                         switch (m_direction) {
                             case Direction.Top: {
-                                    --targetPosY;
+                                    --targetPosZ;
                                 }
                                 break;
                             case Direction.Bottom: {
-                                    ++targetPosY;
+                                    ++targetPosZ;
                                 }
                                 break;
                             case Direction.Left: {
@@ -54,7 +54,7 @@ namespace game {
                                 }
                                 break;
                         }
-                        m_characterModule.SetTargetPos(targetPosX, targetPosY);
+                        m_characterModule.SetTargetPos(targetPosX, 1, targetPosZ);
                     }
                     return true;
                 case Step.Processing: {
